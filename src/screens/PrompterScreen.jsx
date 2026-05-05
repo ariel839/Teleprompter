@@ -303,7 +303,16 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     const next = !isPlaying
     setIsPlaying(next)
     isPlayingRef.current = next
-    if (next) startRaf()
+    if (next) {
+      startRaf()
+      try {
+        if (mediaRecorderRef.current?.state === 'paused') mediaRecorderRef.current.resume()
+      } catch {}
+    } else {
+      try {
+        if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.pause()
+      } catch {}
+    }
     // Keep camera feed alive on iOS
     if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
   }
