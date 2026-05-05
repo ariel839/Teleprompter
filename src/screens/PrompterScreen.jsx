@@ -445,7 +445,7 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
           <button className="ctrl-btn ctrl-exit" onClick={handleExit} aria-label="Exit">✕</button>
           <button className="ctrl-btn" onClick={handleRewind} aria-label="Rewind">⏮</button>
           <button
-            className={`ctrl-btn ctrl-record-btn ${isPlaying ? 'recording' : ''}`}
+            className={`ctrl-record-btn ${isPlaying ? 'recording' : ''}`}
             onClick={isPlaying ? handleStopRecording : (e) => { e.stopPropagation(); togglePlay(); showControlsTemp() }}
             disabled={finished}
           >
