@@ -303,8 +303,6 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     const next = !isPlaying
     setIsPlaying(next)
     isPlayingRef.current = next
-    // Mute/unmute the audio track — reliable on iOS and desktop
-    streamRef.current?.getAudioTracks().forEach(t => { t.enabled = next })
     if (next) startRaf()
     // Keep camera feed alive on iOS
     if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
