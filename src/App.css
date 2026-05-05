@@ -1018,11 +1018,6 @@ input[type="range"]::-moz-range-thumb {
   padding-bottom: 8px;
 }
 
-.results-draft-btn.draft-saved {
-  color: var(--accent);
-  border-color: rgba(74, 222, 128, 0.4);
-  background: var(--accent-dim);
-}
 
 /* ── Desktop layout — must come last so it overrides base styles ── */
 @media (min-width: 768px) {

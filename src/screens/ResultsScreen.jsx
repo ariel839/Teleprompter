@@ -1,36 +1,44 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef } from 'react'
 
 export default function ResultsScreen({ blob, onEdit, onDiscard }) {
   const videoRef = useRef(null)
   const videoUrlRef = useRef(null)
-  const [draftSaved, setDraftSaved] = useState(false)
   const hasRecording = !!blob
 
-  // Create object URL from blob on mount, revoke on unmount
   useEffect(() => {
     if (!blob) return
     const url = URL.createObjectURL(blob)
     videoUrlRef.current = url
-    if (videoRef.current) {
-      videoRef.current.src = url
-    }
+    if (videoRef.current) videoRef.current.src = url
     return () => URL.revokeObjectURL(url)
   }, [blob])
 
-  function handleSave() {
-    if (!blob || !videoUrlRef.current) return
-    const a = document.createElement('a')
-    a.href = videoUrlRef.current
+  async function handleSave() {
+    if (!blob) return
     const ext = blob.type.includes('mp4') ? 'mp4' : 'webm'
-    a.download = `teleprompter-${Date.now()}.${ext}`
-    a.click()
-  }
+    const fileName = `teleprompter-${Date.now()}.${ext}`
 
-  function handleDraft() {
-    // Store a flag in localStorage; the blob URL lives in memory for this session
-    localStorage.setItem('tp-has-draft', '1')
-    setDraftSaved(true)
-    setTimeout(() => setDraftSaved(false), 2500)
+    // Web Share API opens the native share sheet on iOS — user can "Save Video" to Camera Roll
+    if (navigator.canShare) {
+      const file = new File([blob], fileName, { type: blob.type })
+      if (navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({ files: [file] })
+          return
+        } catch (e) {
+          if (e.name === 'AbortError') return // user cancelled
+          // share failed — fall through to regular download
+        }
+      }
+    }
+
+    // Desktop fallback: browser download
+    const url = videoUrlRef.current
+    if (!url) return
+    const a = document.createElement('a')
+    a.href = url
+    a.download = fileName
+    a.click()
   }
 
   return (
@@ -43,16 +51,10 @@ export default function ResultsScreen({ blob, onEdit, onDiscard }) {
         </p>
       </div>
 
-      {/* On desktop this becomes a two-column grid (video left, actions right) */}
       <div className={`results-layout${hasRecording ? '' : ' results-layout--no-video'}`}>
         {hasRecording && (
           <div className="results-video-wrap">
-            <video
-              ref={videoRef}
-              className="results-video"
-              controls
-              playsInline
-            />
+            <video ref={videoRef} className="results-video" controls playsInline />
           </div>
         )}
 
@@ -61,12 +63,6 @@ export default function ResultsScreen({ blob, onEdit, onDiscard }) {
             <>
               <button className="btn-primary btn-large" onClick={handleSave}>
                 ↓ Save Video
-              </button>
-              <button
-                className={`btn-secondary results-draft-btn ${draftSaved ? 'draft-saved' : ''}`}
-                onClick={handleDraft}
-              >
-                {draftSaved ? '✓ Draft Saved' : '📋 Save as Draft'}
               </button>
               <button className="btn-secondary" onClick={onDiscard}>
                 Discard Recording

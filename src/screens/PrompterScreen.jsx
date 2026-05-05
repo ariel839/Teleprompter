@@ -88,7 +88,10 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
       // Start recording the camera stream
       if (typeof MediaRecorder !== 'undefined') {
         chunksRef.current = []
-        const mimeType = MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+        // iOS Safari only supports mp4; prefer it first, fall back to webm on desktop
+        const mimeType = MediaRecorder.isTypeSupported('video/mp4')
+          ? 'video/mp4'
+          : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
           ? 'video/webm;codecs=vp9'
           : MediaRecorder.isTypeSupported('video/webm')
           ? 'video/webm'
