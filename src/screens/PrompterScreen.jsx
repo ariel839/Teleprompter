@@ -73,7 +73,12 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     setCameraError(false)
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
-        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } },
+        video: {
+          facingMode: 'user',
+          width:  { ideal: 1920, min: 640 },
+          height: { ideal: 1080, min: 480 },
+          frameRate: { ideal: 30 },
+        },
         audio: false,
       })
       streamRef.current = stream
@@ -96,7 +101,10 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
           : MediaRecorder.isTypeSupported('video/webm')
           ? 'video/webm'
           : ''
-        const recorder = new MediaRecorder(stream, mimeType ? { mimeType } : {})
+        const recorder = new MediaRecorder(stream, {
+          ...(mimeType ? { mimeType } : {}),
+          videoBitsPerSecond: 8_000_000, // 8 Mbps — matches typical 1080p recording quality
+        })
         recorder.ondataavailable = (e) => {
           if (e.data.size > 0) chunksRef.current.push(e.data)
         }
