@@ -79,7 +79,7 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
           height: { ideal: 1080, min: 480 },
           frameRate: { ideal: 30 },
         },
-        audio: false,
+        audio: true,
       })
       streamRef.current = stream
       if (videoRef.current) {
