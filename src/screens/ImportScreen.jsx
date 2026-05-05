@@ -17,12 +17,12 @@ export default function ImportScreen({ script, onScriptChange, onContinue }) {
       if (file.name.endsWith('.txt')) {
         const text = await file.text()
         onScriptChange(text)
-        setShowPaste(false)
+        setShowPaste(true)
       } else if (file.name.endsWith('.docx')) {
         const arrayBuffer = await file.arrayBuffer()
         const result = await mammoth.extractRawText({ arrayBuffer })
         onScriptChange(result.value.trim())
-        setShowPaste(false)
+        setShowPaste(true)
       } else {
         setError('Please upload a .txt or .docx file')
       }
