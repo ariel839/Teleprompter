@@ -435,11 +435,11 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
           <button className="ctrl-btn ctrl-exit" onClick={handleExit} aria-label="Exit">✕</button>
           <button className="ctrl-btn" onClick={handleRewind} aria-label="Rewind">⏮</button>
           <button
-            className={`ctrl-btn ctrl-play ${isPlaying ? 'playing' : ''}`}
+            className={`ctrl-btn ctrl-record-btn ${isPlaying ? 'recording' : ''}`}
             onClick={(e) => { e.stopPropagation(); togglePlay(); showControlsTemp() }}
             disabled={finished}
           >
-            {finished ? '✓' : isPlaying ? '⏸' : '▶'}
+            {finished ? '✓' : <span className="record-dot" />}
           </button>
           <button
             className={`ctrl-btn ${cameraOn ? 'camera-active' : ''}`}
@@ -457,14 +457,12 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
           </button>
         </div>
 
-        {/* Speed +/- row (manual mode only) */}
-        {!isVoiceMode && (
-          <div className="speed-row">
-            <button className="speed-adj-btn" onClick={(e) => { e.stopPropagation(); adjustSpeed(-1) }}>−</button>
-            <span className="speed-label">Speed {displaySpeed}/10</span>
-            <button className="speed-adj-btn" onClick={(e) => { e.stopPropagation(); adjustSpeed(+1) }}>+</button>
-          </div>
-        )}
+        {/* Speed +/- row — always visible */}
+        <div className="speed-row">
+          <button className="speed-adj-btn" onClick={(e) => { e.stopPropagation(); adjustSpeed(-1) }}>−</button>
+          <span className="speed-label">Speed {displaySpeed}/10</span>
+          <button className="speed-adj-btn" onClick={(e) => { e.stopPropagation(); adjustSpeed(+1) }}>+</button>
+        </div>
 
         {isVoiceMode && voiceStatus === 'listening' && (
           <div className="voice-indicator"><span className="voice-dot" /> Voice active</div>
