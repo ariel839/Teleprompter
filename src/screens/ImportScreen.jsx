@@ -58,52 +58,53 @@ export default function ImportScreen({ script, onScriptChange, onContinue }) {
       </div>
 
       <div className="import-body">
-        {/* Drop zone */}
-        <div
-          className={`drop-zone ${dragging ? 'dragging' : ''} ${loading ? 'loading' : ''}`}
-          onDrop={handleDrop}
-          onDragOver={handleDragOver}
-          onDragLeave={handleDragLeave}
-          onClick={() => fileInputRef.current?.click()}
-          role="button"
-          tabIndex={0}
-          onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
-          aria-label="Upload file"
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept=".txt,.docx"
-            onChange={handleFileInput}
-            style={{ display: 'none' }}
-          />
-          {loading ? (
-            <div className="drop-zone-inner">
-              <div className="spinner" />
-              <span>Reading file…</span>
-            </div>
-          ) : (
-            <div className="drop-zone-inner">
-              <div className="drop-icon">📄</div>
-              <strong>Drop a file here</strong>
-              <span>or tap to browse</span>
-              <span className="drop-hint">.txt or .docx</span>
-            </div>
-          )}
+        {/* Left column on desktop: drop zone */}
+        <div className="import-col import-col-left">
+          <div
+            className={`drop-zone ${dragging ? 'dragging' : ''} ${loading ? 'loading' : ''}`}
+            onDrop={handleDrop}
+            onDragOver={handleDragOver}
+            onDragLeave={handleDragLeave}
+            onClick={() => fileInputRef.current?.click()}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => e.key === 'Enter' && fileInputRef.current?.click()}
+            aria-label="Upload file"
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept=".txt,.docx"
+              onChange={handleFileInput}
+              style={{ display: 'none' }}
+            />
+            {loading ? (
+              <div className="drop-zone-inner">
+                <div className="spinner" />
+                <span>Reading file…</span>
+              </div>
+            ) : (
+              <div className="drop-zone-inner">
+                <div className="drop-icon">📄</div>
+                <strong>Drop a file here</strong>
+                <span>or tap to browse</span>
+                <span className="drop-hint">.txt or .docx</span>
+              </div>
+            )}
+          </div>
+          {error && <p className="error-msg">{error}</p>}
         </div>
 
-        {error && <p className="error-msg">{error}</p>}
+        {/* Right column on desktop: paste / type */}
+        <div className="import-col import-col-right">
+          <div className="paste-section">
+            <button
+              className="paste-toggle"
+              onClick={() => setShowPaste(v => !v)}
+            >
+              {showPaste ? 'Hide text editor' : '✏️ Paste or type script'}
+            </button>
 
-        {/* Paste option */}
-        <div className="paste-section">
-          <button
-            className="paste-toggle"
-            onClick={() => setShowPaste(v => !v)}
-          >
-            {showPaste ? 'Hide text editor' : '✏️ Paste or type script'}
-          </button>
-
-          {showPaste && (
             <textarea
               className="paste-area"
               placeholder="Paste or type your script here…"
@@ -111,26 +112,25 @@ export default function ImportScreen({ script, onScriptChange, onContinue }) {
               onChange={(e) => onScriptChange(e.target.value)}
               rows={8}
               autoFocus={!script}
+              style={{ display: showPaste ? 'block' : 'none' }}
             />
+          </div>
+
+          {script && (
+            <div className="script-meta">
+              <span className="word-count">{wordCount} words · ~{Math.ceil(wordCount / 130)} min read</span>
+              <button
+                className="clear-btn"
+                onClick={() => {
+                  onScriptChange('')
+                  setShowPaste(true)
+                }}
+              >
+                Clear
+              </button>
+            </div>
           )}
         </div>
-
-        {/* Word count + clear */}
-        {script && (
-          <div className="script-meta">
-            <span className="word-count">{wordCount} words · ~{Math.ceil(wordCount / 130)} min read</span>
-            <button
-              className="clear-btn"
-              onClick={() => {
-                onScriptChange('')
-                setShowPaste(true)
-                localStorage.removeItem('tp-script')
-              }}
-            >
-              Clear
-            </button>
-          </div>
-        )}
       </div>
 
       <div className="import-footer">

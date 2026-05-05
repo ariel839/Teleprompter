@@ -16,7 +16,11 @@ export default function EditScreen({ script, onScriptChange, settings, onSetting
   }
 
   const currentFont = FONTS.find(f => f.id === settings.fontFamily) || FONTS[0]
-  const previewText = script.slice(0, 150).trim() || 'Your script will appear here…'
+  const scrollText = script.slice(0, 400).trim() || 'Your script will appear here…'
+  // Same px/s formula as PrompterScreen: speed * fontSize * 0.24
+  // Cycle duration = ~300px of text / px-per-second, clamped to [2s, 30s]
+  const pxPerSec = settings.speed * settings.fontSize * 0.24
+  const scrollDuration = Math.min(30, Math.max(2, Math.round(300 / pxPerSec)))
 
   return (
     <div className="edit-screen">
@@ -76,7 +80,13 @@ export default function EditScreen({ script, onScriptChange, settings, onSetting
                 lineHeight: 1.65,
               }}
             >
-              {previewText}
+              <div
+                className="preview-scroll-text"
+                style={{ animationDuration: `${scrollDuration}s` }}
+              >
+                <span>{scrollText}</span>
+                <span aria-hidden="true">{scrollText}</span>
+              </div>
             </div>
           </section>
         </div>
@@ -214,16 +224,17 @@ export default function EditScreen({ script, onScriptChange, settings, onSetting
             </div>
           </section>
 
-          <div className="edit-go-live">
-            <button
-              className="btn-primary btn-large"
-              onClick={onGoLive}
-              disabled={!script.trim()}
-            >
-              🎬 Go Live
-            </button>
-          </div>
         </div>
+      </div>
+
+      <div className="edit-footer">
+        <button
+          className="btn-primary btn-large"
+          onClick={onGoLive}
+          disabled={!script.trim()}
+        >
+          🎬 Go Live
+        </button>
       </div>
     </div>
   )

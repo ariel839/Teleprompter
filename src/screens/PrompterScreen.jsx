@@ -9,7 +9,7 @@ const FONT_MAP = {
   lexend: "'Lexend', sans-serif",
 }
 
-export default function PrompterScreen({ script, settings, autoStart = false, onExit, onFinish }) {
+export default function PrompterScreen({ script, settings, autoStart = false, onExit, onFinish, onSpeedChange }) {
   const { fontSize, alignment, speed, mode, fontFamily, camera: cameraEnabled, textBg } = settings
 
   // ── State ──
@@ -275,8 +275,9 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     const next = Math.max(1, Math.min(10, liveSpeedRef.current + delta))
     liveSpeedRef.current = next
     setDisplaySpeed(next)
+    onSpeedChange?.(next)
     showControlsTemp()
-  }, [showControlsTemp])
+  }, [showControlsTemp, onSpeedChange])
 
   // ── Handlers ──
   const handleTap = (e) => {

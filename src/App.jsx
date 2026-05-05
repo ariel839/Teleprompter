@@ -31,13 +31,14 @@ export default function App() {
 
   // Load saved script on mount
   useEffect(() => {
-    const saved = localStorage.getItem('tp-script')
+    const saved = sessionStorage.getItem('tp-script')
     if (saved) setScript(saved)
   }, [])
 
-  // Save script
+  // Save script for this session only (clears on new tab / browser restart)
   useEffect(() => {
-    if (script) localStorage.setItem('tp-script', script)
+    if (script) sessionStorage.setItem('tp-script', script)
+    else sessionStorage.removeItem('tp-script')
   }, [script])
 
   // Save settings
@@ -89,6 +90,7 @@ export default function App() {
           autoStart={tryMode}
           onExit={handlePrompterExit}
           onFinish={handlePrompterFinish}
+          onSpeedChange={(newSpeed) => setSettings(prev => ({ ...prev, speed: newSpeed }))}
         />
       )}
       {screen === SCREENS.RESULTS && (

@@ -44,135 +44,6 @@ body {
   height: 100dvh;
 }
 
-/* ── Desktop layout ── */
-@media (min-width: 768px) {
-  /* ── Import screen ── */
-  .import-screen {
-    max-width: 600px;
-    margin: 0 auto;
-    height: 100%;
-  }
-
-  .import-header {
-    padding: 64px 48px 40px;
-  }
-
-  .import-header h1 {
-    font-size: 36px;
-  }
-
-  .import-body {
-    padding: 0 48px;
-    gap: 20px;
-  }
-
-  .import-footer {
-    padding: 32px 48px;
-    padding-bottom: 40px;
-  }
-
-  .drop-zone {
-    padding: 48px 32px;
-  }
-
-  /* ── Edit screen: full-width two-column split ── */
-  .edit-screen {
-    width: 100%;
-    max-width: 1100px;
-    margin: 0 auto;
-  }
-
-  .edit-nav {
-    padding: 16px 40px;
-    padding-top: 16px;
-  }
-
-  /* Body fills remaining height, split 50/50 — no scroll on the grid itself */
-  .edit-body {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0;
-    flex: 1;
-    min-height: 0;
-    overflow: hidden;
-  }
-
-  /* Both columns are full-height flex columns */
-  .edit-col {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    padding: 28px 40px 40px;
-    height: 100%;
-    min-height: 0;
-  }
-
-  /* Left column: no scrollbar — textarea grows to fill */
-  .edit-col-left {
-    border-right: 1px solid var(--border);
-    overflow: hidden;
-  }
-
-  /* Script section stretches so its textarea fills the left column */
-  .edit-col-left > section:first-child {
-    flex: 1;
-    min-height: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .edit-col-left > section:first-child .edit-textarea {
-    flex: 1;
-    resize: none;
-    min-height: 0;
-  }
-
-  /* Preview: fixed size below the textarea */
-  .preview-block {
-    max-height: 160px;
-  }
-
-  /* Right column: single scrollbar for all settings */
-  .edit-col-right {
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-
-  .edit-go-live {
-    margin-top: auto;
-    padding-top: 8px;
-  }
-
-  /* ── Results screen ── */
-  .results-screen {
-    max-width: 820px;
-    margin: 0 auto;
-    height: 100%;
-  }
-
-  .results-header {
-    padding: 48px 48px 28px;
-  }
-
-  .results-layout {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 32px;
-    padding: 0 48px 48px;
-    align-items: start;
-  }
-
-  .results-layout--no-video {
-    grid-template-columns: 1fr;
-    max-width: 400px;
-  }
-
-  .results-video {
-    max-height: 400px;
-  }
-}
-
 button {
   cursor: pointer;
   border: none;
@@ -545,6 +416,46 @@ input[type="range"]::-moz-range-thumb {
   max-height: 120px;
   overflow: hidden;
   word-wrap: break-word;
+  position: relative;
+}
+
+/* Fade top/bottom edges so text fades into view like the prompter */
+.preview-block::before,
+.preview-block::after {
+  content: '';
+  position: absolute;
+  left: 0; right: 0;
+  height: 24px;
+  z-index: 1;
+  pointer-events: none;
+}
+.preview-block::before {
+  top: 0;
+  background: linear-gradient(to bottom, var(--surface), transparent);
+}
+.preview-block::after {
+  bottom: 0;
+  background: linear-gradient(to top, var(--surface), transparent);
+}
+
+.preview-scroll-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1.65em;
+  animation: previewScroll linear infinite;
+}
+
+.preview-scroll-text:hover {
+  animation-play-state: paused;
+}
+
+.preview-scroll-text span {
+  display: block;
+}
+
+@keyframes previewScroll {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
 }
 
 .setting-row {
@@ -624,6 +535,16 @@ input[type="range"]::-moz-range-thumb {
 
 .edit-go-live {
   padding-top: 8px;
+}
+
+.edit-footer {
+  flex-shrink: 0;
+  padding: 16px 20px;
+  padding-bottom: max(24px, env(safe-area-inset-bottom));
+  border-top: 1px solid var(--border);
+  background: var(--surface);
+  display: flex;
+  justify-content: center;
 }
 
 /* ── Prompter Screen ── */
@@ -1101,4 +1022,183 @@ input[type="range"]::-moz-range-thumb {
   color: var(--accent);
   border-color: rgba(74, 222, 128, 0.4);
   background: var(--accent-dim);
+}
+
+/* ── Desktop layout — must come last so it overrides base styles ── */
+@media (min-width: 768px) {
+  /* ── Import screen ── */
+  .import-screen {
+    width: 100%;
+    height: 100%;
+  }
+
+  .import-header {
+    padding: 48px 48px 32px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .import-header h1 {
+    font-size: 32px;
+  }
+
+  .import-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+    flex: 1;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .import-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 32px 48px;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .import-col-left {
+    border-right: 1px solid var(--border);
+  }
+
+  .import-col-right {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Drop zone fills left column */
+  .import-col-left .drop-zone {
+    flex: 1;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Always show textarea on desktop, hide the toggle */
+  .import-col-right .paste-toggle {
+    display: none;
+  }
+
+  .import-col-right .paste-area {
+    display: block !important;
+    flex: 1;
+    min-height: 0;
+  }
+
+  .import-footer {
+    padding: 20px 48px;
+    padding-bottom: 24px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: center;
+  }
+
+  .import-footer .btn-primary {
+    max-width: 400px;
+    width: 100%;
+  }
+
+  /* ── Edit screen: full-width two-column split ── */
+  .edit-screen {
+    width: 100%;
+  }
+
+  .edit-nav {
+    padding: 16px 40px;
+    padding-top: 16px;
+  }
+
+  /* Body fills remaining height, split 50/50 */
+  .edit-body {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Both columns are full-height flex columns */
+  .edit-col {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 28px 40px 40px;
+    height: 100%;
+    min-height: 0;
+  }
+
+  /* Left column: no scrollbar — textarea grows to fill */
+  .edit-col-left {
+    border-right: 1px solid var(--border);
+    overflow: hidden;
+  }
+
+  /* Script section grows so textarea fills the left column */
+  .edit-col-left > section:first-child {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .edit-col-left > section:first-child .edit-textarea {
+    flex: 1;
+    resize: none;
+    min-height: 0;
+  }
+
+  /* Preview: fixed height below the textarea */
+  .edit-col-left .preview-block {
+    max-height: 160px;
+  }
+
+  /* Right column: single scrollbar for all settings */
+  .edit-col-right {
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Footer spans full width below both columns */
+  .edit-footer {
+    padding: 20px 48px;
+    padding-bottom: 24px;
+  }
+
+  .edit-footer .btn-primary {
+    max-width: 400px;
+    width: 100%;
+  }
+
+  /* ── Results screen ── */
+  .results-screen {
+    max-width: 820px;
+    margin: 0 auto;
+    height: 100%;
+  }
+
+  .results-header {
+    padding: 48px 48px 28px;
+  }
+
+  .results-layout {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+    padding: 0 48px 48px;
+    align-items: start;
+  }
+
+  .results-layout--no-video {
+    grid-template-columns: 1fr;
+    max-width: 400px;
+  }
+
+  .results-video {
+    max-height: 400px;
+  }
 }
