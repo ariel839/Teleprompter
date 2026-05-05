@@ -303,22 +303,9 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     const next = !isPlaying
     setIsPlaying(next)
     isPlayingRef.current = next
-    if (next) {
-      startRaf()
-      // Re-enable audio track (works on all platforms)
-      streamRef.current?.getAudioTracks().forEach(t => { t.enabled = true })
-      // Resume MediaRecorder if it was paused (Chrome/desktop)
-      try {
-        if (mediaRecorderRef.current?.state === 'paused') mediaRecorderRef.current.resume()
-      } catch {}
-    } else {
-      // Mute audio immediately — guaranteed to work on iOS and desktop
-      streamRef.current?.getAudioTracks().forEach(t => { t.enabled = false })
-      // Also pause MediaRecorder for clean video where supported
-      try {
-        if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.pause()
-      } catch {}
-    }
+    // Mute/unmute the audio track — reliable on iOS and desktop
+    streamRef.current?.getAudioTracks().forEach(t => { t.enabled = next })
+    if (next) startRaf()
     // Keep camera feed alive on iOS
     if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
   }
