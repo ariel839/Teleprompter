@@ -303,8 +303,23 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     const next = !isPlaying
     setIsPlaying(next)
     isPlayingRef.current = next
-    if (next) startRaf()
-    // Keep camera feed alive on iOS (it can freeze on state changes)
+    if (next) {
+      startRaf()
+      // Re-enable audio track (works on all platforms)
+      streamRef.current?.getAudioTracks().forEach(t => { t.enabled = true })
+      // Resume MediaRecorder if it was paused (Chrome/desktop)
+      try {
+        if (mediaRecorderRef.current?.state === 'paused') mediaRecorderRef.current.resume()
+      } catch {}
+    } else {
+      // Mute audio immediately — guaranteed to work on iOS and desktop
+      streamRef.current?.getAudioTracks().forEach(t => { t.enabled = false })
+      // Also pause MediaRecorder for clean video where supported
+      try {
+        if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.pause()
+      } catch {}
+    }
+    // Keep camera feed alive on iOS
     if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
   }
 
@@ -442,7 +457,7 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
             onClick={(e) => { e.stopPropagation(); togglePlay(); showControlsTemp() }}
             disabled={finished}
           >
-            {finished ? '✓' : <span className="record-dot" />}
+            {finished ? '✓' : isPlaying ? <span className="record-pause" /> : <span className="record-dot" />}
           </button>
           <button
             className={`ctrl-btn ${cameraOn ? 'camera-active' : ''}`}

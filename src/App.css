@@ -827,21 +827,31 @@ input[type="range"]::-moz-range-thumb {
   opacity: 0.5;
 }
 
-/* Red dot inside */
+/* Red circle — idle state */
 .record-dot {
   width: 48px;
   height: 48px;
   border-radius: 50%;
   background: #ff3b30;
   display: block;
-  transition: border-radius 0.25s cubic-bezier(0.4, 0, 0.2, 1),
-              transform   0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Morphs to rounded square when recording */
-.recording .record-dot {
-  border-radius: 10px;
-  transform: scale(0.68);
+/* Pause bars — shown while recording */
+.record-pause {
+  display: flex;
+  gap: 7px;
+  align-items: center;
+  justify-content: center;
+}
+
+.record-pause::before,
+.record-pause::after {
+  content: '';
+  display: block;
+  width: 6px;
+  height: 26px;
+  border-radius: 3px;
+  background: #fff;
 }
 
 @keyframes recordRingPulse {
