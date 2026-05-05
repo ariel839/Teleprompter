@@ -207,7 +207,7 @@ export default function EditScreen({ script, onScriptChange, settings, onSetting
                   className={`btn-option ${settings.mode === 'manual' ? 'active' : ''}`}
                   onClick={() => update('mode', 'manual')}
                 >
-                  ⚡ Manual
+                  🎚️ Manual
                 </button>
                 <button
                   className={`btn-option btn-option-voice ${settings.mode === 'voice' ? 'active' : ''}`}

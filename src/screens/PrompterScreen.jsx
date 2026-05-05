@@ -453,7 +453,7 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
             onClick={handleToggleMode}
             aria-label="Toggle mode"
           >
-            {isVoiceMode ? '🎤' : '⚡'}
+            {isVoiceMode ? '🎤' : '🎚️'}
           </button>
         </div>
 
