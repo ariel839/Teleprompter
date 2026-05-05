@@ -304,6 +304,16 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     setIsPlaying(next)
     isPlayingRef.current = next
     if (next) startRaf()
+    // Keep camera feed alive on iOS (it can freeze on state changes)
+    if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
+  }
+
+  const handleStopRecording = (e) => {
+    e.stopPropagation()
+    setIsPlaying(false)
+    isPlayingRef.current = false
+    stopRaf()
+    collectRecordingAndFinish()
   }
 
   const handleRewind = (e) => {
@@ -436,7 +446,7 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
           <button className="ctrl-btn" onClick={handleRewind} aria-label="Rewind">⏮</button>
           <button
             className={`ctrl-btn ctrl-record-btn ${isPlaying ? 'recording' : ''}`}
-            onClick={(e) => { e.stopPropagation(); togglePlay(); showControlsTemp() }}
+            onClick={isPlaying ? handleStopRecording : (e) => { e.stopPropagation(); togglePlay(); showControlsTemp() }}
             disabled={finished}
           >
             {finished ? '✓' : <span className="record-dot" />}
