@@ -110,9 +110,8 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
       setShowRecHint(true)
       setTimeout(() => setShowRecHint(false), 4000)
 
-      // Start recording — reset chunks for a fresh take
+      // Reset chunks — recording starts when user presses play
       chunksRef.current = []
-      startRecording()
     } catch {
       setCameraError(true)
       setCameraOn(false)
@@ -306,12 +305,22 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     setIsPlaying(next)
     isPlayingRef.current = next
     if (next) {
-      // Resume: start scrolling + start a new recorder session (appends to existing chunks)
       startRaf()
-      if (cameraOn) startRecording()
+      if (cameraOn) {
+        const rec = mediaRecorderRef.current
+        if (!rec || rec.state === 'inactive') {
+          // First play — create the one recorder for this session
+          startRecording()
+        } else if (rec.state === 'paused') {
+          // Subsequent plays — resume the same recorder (keeps audio session alive on iOS)
+          try { rec.resume() } catch {}
+        }
+      }
     } else {
-      // Pause: stop scrolling + stop recorder (flushes remaining data via ondataavailable)
-      stopMediaRecorder()
+      // Pause — suspend recording without ending the audio session
+      try {
+        if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.pause()
+      } catch {}
     }
     // Keep camera preview alive on iOS
     if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
