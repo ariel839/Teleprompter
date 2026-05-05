@@ -308,13 +308,6 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
   }
 
-  const handleStopRecording = (e) => {
-    e.stopPropagation()
-    setIsPlaying(false)
-    isPlayingRef.current = false
-    stopRaf()
-    collectRecordingAndFinish()
-  }
 
   const handleRewind = (e) => {
     e.stopPropagation()
@@ -446,7 +439,7 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
           <button className="ctrl-btn" onClick={handleRewind} aria-label="Rewind">⏮</button>
           <button
             className={`ctrl-record-btn ${isPlaying ? 'recording' : ''}`}
-            onClick={isPlaying ? handleStopRecording : (e) => { e.stopPropagation(); togglePlay(); showControlsTemp() }}
+            onClick={(e) => { e.stopPropagation(); togglePlay(); showControlsTemp() }}
             disabled={finished}
           >
             {finished ? '✓' : <span className="record-dot" />}
