@@ -52,6 +52,26 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
   const pixelsPerUnit = fontSize * 0.24
 
   // ── Camera ──
+  const startRecording = useCallback(() => {
+    if (!streamRef.current || typeof MediaRecorder === 'undefined') return
+    const mimeType = MediaRecorder.isTypeSupported('video/mp4')
+      ? 'video/mp4'
+      : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
+      ? 'video/webm;codecs=vp9'
+      : MediaRecorder.isTypeSupported('video/webm')
+      ? 'video/webm'
+      : ''
+    const recorder = new MediaRecorder(streamRef.current, {
+      ...(mimeType ? { mimeType } : {}),
+      videoBitsPerSecond: 8_000_000,
+    })
+    recorder.ondataavailable = (e) => {
+      if (e.data.size > 0) chunksRef.current.push(e.data)
+    }
+    mediaRecorderRef.current = recorder
+    recorder.start()
+  }, [])
+
   const stopMediaRecorder = useCallback(() => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== 'inactive') {
       mediaRecorderRef.current.stop()
@@ -90,27 +110,9 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
       setShowRecHint(true)
       setTimeout(() => setShowRecHint(false), 4000)
 
-      // Start recording the camera stream
-      if (typeof MediaRecorder !== 'undefined') {
-        chunksRef.current = []
-        // iOS Safari only supports mp4; prefer it first, fall back to webm on desktop
-        const mimeType = MediaRecorder.isTypeSupported('video/mp4')
-          ? 'video/mp4'
-          : MediaRecorder.isTypeSupported('video/webm;codecs=vp9')
-          ? 'video/webm;codecs=vp9'
-          : MediaRecorder.isTypeSupported('video/webm')
-          ? 'video/webm'
-          : ''
-        const recorder = new MediaRecorder(stream, {
-          ...(mimeType ? { mimeType } : {}),
-          videoBitsPerSecond: 8_000_000, // 8 Mbps — matches typical 1080p recording quality
-        })
-        recorder.ondataavailable = (e) => {
-          if (e.data.size > 0) chunksRef.current.push(e.data)
-        }
-        mediaRecorderRef.current = recorder
-        recorder.start()
-      }
+      // Start recording — reset chunks for a fresh take
+      chunksRef.current = []
+      startRecording()
     } catch {
       setCameraError(true)
       setCameraOn(false)
@@ -304,16 +306,14 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     setIsPlaying(next)
     isPlayingRef.current = next
     if (next) {
+      // Resume: start scrolling + start a new recorder session (appends to existing chunks)
       startRaf()
-      try {
-        if (mediaRecorderRef.current?.state === 'paused') mediaRecorderRef.current.resume()
-      } catch {}
+      if (cameraOn) startRecording()
     } else {
-      try {
-        if (mediaRecorderRef.current?.state === 'recording') mediaRecorderRef.current.pause()
-      } catch {}
+      // Pause: stop scrolling + stop recorder (flushes remaining data via ondataavailable)
+      stopMediaRecorder()
     }
-    // Keep camera feed alive on iOS
+    // Keep camera preview alive on iOS
     if (videoRef.current && cameraOn) videoRef.current.play().catch(() => {})
   }
 
