@@ -63,13 +63,13 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
       : ''
     const recorder = new MediaRecorder(streamRef.current, {
       ...(mimeType ? { mimeType } : {}),
-      videoBitsPerSecond: 8_000_000,
+      videoBitsPerSecond: 4_000_000,
     })
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data)
     }
     mediaRecorderRef.current = recorder
-    recorder.start()
+    recorder.start(5000) // flush a chunk every 5 s to avoid unbounded memory growth
   }, [])
 
   const stopMediaRecorder = useCallback(() => {
@@ -379,6 +379,9 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
     if (innerRef.current) innerRef.current.style.transform = 'translateY(0)'
     setProgress(0); setFinished(false); setCurrentWordIdx(0)
     voiceMatchRef.current = 0; resetVoice()
+    // discard the previous take so the next recording is clean
+    stopMediaRecorder()
+    chunksRef.current = []
   }
 
   return (
