@@ -741,6 +741,18 @@ input[type="range"]::-moz-range-thumb {
 }
 
 /* Controls */
+.prompter-top-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: max(14px, env(safe-area-inset-top)) 16px 12px;
+  display: flex;
+  align-items: center;
+  z-index: 25;
+  pointer-events: auto;
+}
+
 .prompter-controls {
   position: fixed;
   bottom: 0;

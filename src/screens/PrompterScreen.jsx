@@ -453,10 +453,14 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
         ))}
       </div>
 
+      {/* Top nav — always visible */}
+      <div className="prompter-top-nav">
+        <button className="ctrl-btn ctrl-exit" onClick={handleExit} aria-label="Exit">✕</button>
+      </div>
+
       {/* Controls overlay */}
       <div className={`prompter-controls ${showControls ? 'visible' : ''}`}>
         <div className="controls-row">
-          <button className="ctrl-btn ctrl-exit" onClick={handleExit} aria-label="Exit">✕</button>
           <button className="ctrl-btn" onClick={handleRewind} aria-label="Rewind">⏮</button>
           <button
             className={`ctrl-record-btn ${isPlaying ? 'recording' : ''}`}
