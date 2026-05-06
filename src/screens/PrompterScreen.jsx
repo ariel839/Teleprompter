@@ -463,7 +463,7 @@ export default function PrompterScreen({ script, settings, autoStart = false, on
       </div>
 
       {/* Controls overlay */}
-      <div className={`prompter-controls ${showControls ? 'visible' : ''}`}>
+      <div className="prompter-controls visible">
         <div className="controls-row">
           <button className="ctrl-btn" onClick={handleRewind} aria-label="Rewind">⏮</button>
           <button
